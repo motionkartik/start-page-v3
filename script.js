@@ -7,44 +7,45 @@
 // ========================================
 
 const defaultCategories = [
-    { id: 'dev', name: 'Development', icon: 'fa-solid fa-code' },
-    { id: 'social', name: 'Social', icon: 'fa-solid fa-users' },
-    { id: 'media', name: 'Media', icon: 'fa-solid fa-play' },
-    { id: 'productivity', name: 'Productivity', icon: 'fa-solid fa-briefcase' }
+    { id: 'essentials', name: 'Essentials', icon: 'fa-solid fa-code', pinned: true, hidden: false },
+    { id: 'social', name: 'Social', icon: 'fa-solid fa-users', pinned: false, hidden: false },
+    { id: 'media', name: 'Media', icon: 'fa-solid fa-play', pinned: false, hidden: false },
+    { id: 'productivity', name: 'Productivity', icon: 'fa-solid fa-briefcase', pinned: false, hidden: false }
 ];
 
 const defaultLinks = {
-    'dev': [
-        { name: 'GitHub', url: 'https://github.com', icon: 'fa-brands fa-github' },
-        { name: 'GitLab', url: 'https://gitlab.com', icon: 'fa-brands fa-gitlab' },
-        { name: 'Stack Overflow', url: 'https://stackoverflow.com', icon: 'fa-brands fa-stack-overflow' },
-        { name: 'CodePen', url: 'https://codepen.io', icon: 'fa-brands fa-codepen' },
-        { name: 'Vercel', url: 'https://vercel.com', icon: 'fa-solid fa-v' },
-        { name: 'Docker', url: 'https://docker.com', icon: 'fa-brands fa-docker' }
+    'essentials': [
+        { name: 'Whatsapp', url: 'https://web.whatsapp.com/', icon: 'fa-brands fa-whatsapp', hidden: false },
+        { name: 'Telegram', url: 'https://web.telegram.org/z/', icon: 'fa-brands fa-telegram', hidden: false },
+        { name: 'Gmail', url: 'https://mail.google.com/mail/u/1/#inbox', icon: 'fa-regular fa-envelope', hidden: false },
+        { name: 'Google Drive', url: 'https://drive.google.com/drive/u/0/my-drive', icon: 'fa-brands fa-google-drive', hidden: false },
+        { name: 'Youtube', url: 'https://www.youtube.com/', icon: 'fa-brands fa-youtube', hidden: false },
+        { name: 'Google Sheets', url: 'https://docs.google.com/spreadsheets/u/1/', icon: 'fa-solid fa-table"', hidden: false }
+        
     ],
     'social': [
-        { name: 'Reddit', url: 'https://reddit.com', icon: 'fa-brands fa-reddit-alien' },
-        { name: 'Twitter', url: 'https://twitter.com', icon: 'fa-brands fa-x-twitter' },
-        { name: 'Discord', url: 'https://discord.com', icon: 'fa-brands fa-discord' },
-        { name: 'LinkedIn', url: 'https://linkedin.com', icon: 'fa-brands fa-linkedin' },
-        { name: 'Mastodon', url: 'https://mastodon.social', icon: 'fa-brands fa-mastodon' },
-        { name: 'Twitch', url: 'https://twitch.tv', icon: 'fa-brands fa-twitch' }
+        { name: 'Reddit', url: 'https://reddit.com', icon: 'fa-brands fa-reddit-alien', hidden: false },
+        { name: 'Twitter', url: 'https://twitter.com', icon: 'fa-brands fa-x-twitter', hidden: false },
+        { name: 'Discord', url: 'https://discord.com', icon: 'fa-brands fa-discord', hidden: false },
+        { name: 'LinkedIn', url: 'https://linkedin.com', icon: 'fa-brands fa-linkedin', hidden: false },
+        { name: 'Mastodon', url: 'https://mastodon.social', icon: 'fa-brands fa-mastodon', hidden: false },
+        { name: 'Twitch', url: 'https://twitch.tv', icon: 'fa-brands fa-twitch', hidden: false }
     ],
     'media': [
-        { name: 'YouTube', url: 'https://youtube.com', icon: 'fa-brands fa-youtube' },
-        { name: 'Spotify', url: 'https://spotify.com', icon: 'fa-brands fa-spotify' },
-        { name: 'Netflix', url: 'https://netflix.com', icon: 'fa-solid fa-film' },
-        { name: 'SoundCloud', url: 'https://soundcloud.com', icon: 'fa-brands fa-soundcloud' },
-        { name: 'Prime Video', url: 'https://primevideo.com', icon: 'fa-brands fa-amazon' },
-        { name: 'Plex', url: 'https://plex.tv', icon: 'fa-solid fa-circle-play' }
+        { name: 'YouTube', url: 'https://youtube.com', icon: 'fa-brands fa-youtube', hidden: false },
+        { name: 'Spotify', url: 'https://spotify.com', icon: 'fa-brands fa-spotify', hidden: false },
+        { name: 'Netflix', url: 'https://netflix.com', icon: 'fa-solid fa-film', hidden: false },
+        { name: 'SoundCloud', url: 'https://soundcloud.com', icon: 'fa-brands fa-soundcloud', hidden: false },
+        { name: 'Prime Video', url: 'https://primevideo.com', icon: 'fa-brands fa-amazon', hidden: false },
+        { name: 'Plex', url: 'https://plex.tv', icon: 'fa-solid fa-circle-play', hidden: false }
     ],
     'productivity': [
-        { name: 'Notion', url: 'https://notion.so', icon: 'fa-solid fa-book' },
-        { name: 'Gmail', url: 'https://mail.google.com', icon: 'fa-solid fa-envelope' },
-        { name: 'Calendar', url: 'https://calendar.google.com', icon: 'fa-solid fa-calendar-days' },
-        { name: 'Drive', url: 'https://drive.google.com', icon: 'fa-brands fa-google-drive' },
-        { name: 'Trello', url: 'https://trello.com', icon: 'fa-brands fa-trello' },
-        { name: 'Figma', url: 'https://figma.com', icon: 'fa-brands fa-figma' }
+        { name: 'Notion', url: 'https://notion.so', icon: 'fa-solid fa-book', hidden: false },
+        { name: 'Gmail', url: 'https://mail.google.com', icon: 'fa-solid fa-envelope', hidden: false },
+        { name: 'Calendar', url: 'https://calendar.google.com', icon: 'fa-solid fa-calendar-days', hidden: false },
+        { name: 'Drive', url: 'https://drive.google.com', icon: 'fa-brands fa-google-drive', hidden: false },
+        { name: 'Trello', url: 'https://trello.com', icon: 'fa-brands fa-trello', hidden: false },
+        { name: 'Figma', url: 'https://figma.com', icon: 'fa-brands fa-figma', hidden: false }
     ]
 };
 
@@ -154,6 +155,9 @@ function loadCategories() {
                 cat.icon = match[1];
             }
         }
+        // ensure new fields exist
+        cat.pinned = typeof cat.pinned !== 'undefined' ? cat.pinned : false;
+        cat.hidden = typeof cat.hidden !== 'undefined' ? cat.hidden : false;
         return cat;
     });
 }
@@ -164,7 +168,15 @@ function saveCategories(cats) {
 
 function loadLinks() {
     const saved = localStorage.getItem('links');
-    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultLinks));
+    const base = saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(defaultLinks));
+    // ensure each link has hidden flag
+    Object.keys(base).forEach(catId => {
+        base[catId] = (base[catId] || []).map(link => ({
+            ...link,
+            hidden: typeof link.hidden !== 'undefined' ? link.hidden : false
+        }));
+    });
+    return base;
 }
 
 function saveLinks(lnks) {
@@ -176,6 +188,16 @@ let settings = loadSettings();
 let categories = loadCategories();
 let links = loadLinks();
 let currentEngine = settings.preferredEngine;
+
+// Normalize pinned state: allow only one pinned category (keep first if multiple)
+(() => {
+    const pinned = categories.filter(c => c.pinned);
+    if (pinned.length > 1) {
+        const keep = pinned[0].id;
+        categories.forEach(c => c.pinned = (c.id === keep));
+        saveCategories(categories);
+    }
+})();
 
 // ========================================
 // Theme Management
@@ -491,47 +513,128 @@ async function fetchAQI({ lat, lon, city } = {}) {
 
 function renderLinksGrid() {
     if (!linksGrid) return;
-    
+
     const colorMode = settings.colorMode;
-    
-    linksGrid.innerHTML = categories.map((category, index) => {
-        const categoryLinks = links[category.id] || [];
-        const colorClass = colorMode === 'multi' ? categoryColors[index % categoryColors.length] : 'mauve';
-        
-        return `
-            <section class="link-group" data-category="${category.id}" data-color="${colorClass}">
-                <h2 class="group-title">
-                    <span class="title-icon"><i class="${category.icon}"></i></span>
-                    ${category.name}
-                </h2>
-                <div class="links">
-                    ${categoryLinks.map(link => `
-                        <a href="${link.url}" class="link-card" target="_blank" rel="noopener noreferrer">
-                            <span class="link-icon"><i class="${link.icon || 'fa-solid fa-link'}"></i></span>
-                            <span class="link-text">${link.name}</span>
-                        </a>
-                    `).join('')}
-                </div>
-            </section>
-        `;
-    }).join('');
-    
+
+    // Build visible category list, honoring pinned and hidden
+    const visibleCategories = categories.filter(c => !c.hidden);
+
+    // Find pinned category (first one that's not hidden)
+    const pinned = visibleCategories.find(c => c.pinned) || null;
+
+    // If pinned exists, render it in its own top area and render others in the grid below
+    if (pinned) {
+        const others = visibleCategories.filter(c => c.id !== pinned.id);
+
+        // Render pinned section
+        const pinnedHtml = (() => {
+            const category = pinned;
+            const allCategoryLinks = links[category.id] || [];
+            const categoryLinks = allCategoryLinks.filter(l => !l.hidden);
+            const colorClass = colorMode === 'multi' ? categoryColors[0 % categoryColors.length] : 'mauve';
+            return `
+                <section class="link-group pinned" data-category="${category.id}" data-color="${colorClass}">
+                    <h2 class="group-title">
+                        <span class="title-icon"><i class="${category.icon}"></i></span>
+                        ${category.name}
+                    </h2>
+                    <div class="links">
+                        ${categoryLinks.map(link => `
+                            <a href="${link.url}" class="link-card" target="_blank" rel="noopener noreferrer">
+                                <span class="link-icon"><i class="${link.icon || 'fa-solid fa-link'}"></i></span>
+                                <span class="link-text">${link.name}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                </section>
+            `;
+        })();
+
+        // Render others inside an inner grid container so layout can differ
+        const othersHtml = others.map((category, idx) => {
+            const allCategoryLinks = links[category.id] || [];
+            const categoryLinks = allCategoryLinks.filter(l => !l.hidden);
+            const colorClass = colorMode === 'multi' ? categoryColors[(idx+1) % categoryColors.length] : 'mauve';
+
+            return `
+                <section class="link-group" data-category="${category.id}" data-color="${colorClass}">
+                    <h2 class="group-title">
+                        <span class="title-icon"><i class="${category.icon}"></i></span>
+                        ${category.name}
+                    </h2>
+                    <div class="links">
+                        ${categoryLinks.map(link => `
+                            <a href="${link.url}" class="link-card" target="_blank" rel="noopener noreferrer">
+                                <span class="link-icon"><i class="${link.icon || 'fa-solid fa-link'}"></i></span>
+                                <span class="link-text">${link.name}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                </section>
+            `;
+        }).join('');
+
+        linksGrid.classList.add('has-pinned');
+        linksGrid.innerHTML = `<div class="pinned-section">${pinnedHtml}</div><div class="others-section">${othersHtml}</div>`;
+    } else {
+        // No pinned category, render normally
+        linksGrid.classList.remove('has-pinned');
+        linksGrid.innerHTML = visibleCategories.map((category, index) => {
+            const allCategoryLinks = links[category.id] || [];
+            // only show links that are not hidden
+            const categoryLinks = allCategoryLinks.filter(l => !l.hidden);
+            const colorClass = colorMode === 'multi' ? categoryColors[index % categoryColors.length] : 'mauve';
+
+            return `
+                <section class="link-group" data-category="${category.id}" data-color="${colorClass}">
+                    <h2 class="group-title">
+                        <span class="title-icon"><i class="${category.icon}"></i></span>
+                        ${category.name}
+                    </h2>
+                    <div class="links">
+                        ${categoryLinks.map(link => `
+                            <a href="${link.url}" class="link-card" target="_blank" rel="noopener noreferrer">
+                                <span class="link-icon"><i class="${link.icon || 'fa-solid fa-link'}"></i></span>
+                                <span class="link-text">${link.name}</span>
+                            </a>
+                        `).join('')}
+                    </div>
+                </section>
+            `;
+        }).join('');
+    }
+
     updateGridLayout();
 }
 
 function updateGridLayout() {
     if (!linksGrid) return;
-    
-    const categoryCount = categories.length;
-    
-    linksGrid.classList.remove('grid-single', 'grid-even', 'grid-odd');
-    
-    if (categoryCount === 1) {
-        linksGrid. classList.add('grid-single');
-    } else if (categoryCount % 2 === 0) {
-        linksGrid.classList.add('grid-even');
+    if (linksGrid.classList.contains('has-pinned')) {
+        // Count others (excluding pinned)
+        const visibleCount = categories.filter(c => !c.hidden).length;
+        const others = Math.max(0, visibleCount - 1);
+
+        linksGrid.classList.remove('grid-single', 'grid-even', 'grid-odd');
+        if (others <= 1) {
+            linksGrid.classList.add('grid-single');
+        } else if (others % 2 === 0) {
+            linksGrid.classList.add('grid-even');
+        } else {
+            linksGrid.classList.add('grid-odd');
+        }
     } else {
-        linksGrid.classList. add('grid-odd');
+        // Use visible categories count for layout decisions
+        const visibleCount = categories.filter(c => !c.hidden).length;
+
+        linksGrid.classList.remove('grid-single', 'grid-even', 'grid-odd');
+
+        if (visibleCount === 1) {
+            linksGrid.classList.add('grid-single');
+        } else if (visibleCount % 2 === 0) {
+            linksGrid.classList.add('grid-even');
+        } else {
+            linksGrid.classList.add('grid-odd');
+        }
     }
 }
 
@@ -1209,6 +1312,12 @@ function renderCategoriesSettings() {
             <span class="icon-preview"><i class="${category.icon}"></i></span>
             <input type="text" class="icon-input" value="${category.icon}" placeholder="fa-solid fa-folder" data-field="icon">
             <input type="text" value="${category.name}" placeholder="Category Name" maxlength="20" data-field="name">
+            <button class="toggle-visibility" title="Toggle Visibility" data-action="visibility">
+                <i class="fa-solid ${category.hidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
+            </button>
+            <button class="toggle-pin ${category.pinned ? 'active' : ''}" title="Pin to top" data-action="pin">
+                <i class="fa-solid fa-thumbtack"></i>
+            </button>
             <button class="delete-btn" title="Delete Category" ${categories.length <= 1 ? 'disabled' : ''}>
                 <i class="fa-solid fa-trash"></i>
             </button>
@@ -1242,6 +1351,40 @@ function renderCategoriesSettings() {
             });
         });
         
+        // Visibility toggle
+        const visBtn = item.querySelector('.toggle-visibility');
+        if (visBtn) {
+            visBtn.addEventListener('click', () => {
+                const category = categories.find(c => c.id === categoryId);
+                if (category) {
+                    category.hidden = !category.hidden;
+                    saveCategories(categories);
+                    renderCategoriesSettings();
+                    renderLinksGrid();
+                }
+            });
+        }
+
+        // Pin toggle (ensure only one pinned)
+        const pinBtn = item.querySelector('.toggle-pin');
+        if (pinBtn) {
+            pinBtn.addEventListener('click', () => {
+                const category = categories.find(c => c.id === categoryId);
+                if (!category) return;
+                // If already pinned, unpin it
+                if (category.pinned) {
+                    category.pinned = false;
+                } else {
+                    // unpin others
+                    categories.forEach(c => c.pinned = false);
+                    category.pinned = true;
+                }
+                saveCategories(categories);
+                renderCategoriesSettings();
+                renderLinksGrid();
+            });
+        }
+
         item.querySelector('.delete-btn'). addEventListener('click', () => {
             if (categories.length > 1) {
                 deleteCategory(categoryId);
@@ -1257,7 +1400,9 @@ function addCategory() {
     categories.push({
         id: newId,
         name: 'New Category',
-        icon: 'fa-solid fa-folder'
+        icon: 'fa-solid fa-folder',
+        pinned: false,
+        hidden: false
     });
     links[newId] = [];
     
@@ -1328,6 +1473,9 @@ function renderLinksForCategory(categoryId) {
             <input type="text" class="icon-input" value="${link.icon || 'fa-solid fa-link'}" placeholder="fa-solid fa-link" data-field="icon">
             <input type="text" value="${link.name}" placeholder="Link Name" maxlength="20" data-field="name">
             <input type="url" class="url-input" value="${link.url}" placeholder="https://..." data-field="url">
+            <button class="toggle-visibility" title="Toggle Visibility" data-action="visibility">
+                <i class="fa-solid ${link.hidden ? 'fa-eye-slash' : 'fa-eye'}"></i>
+            </button>
             <button class="delete-btn" title="Delete Link">
                 <i class="fa-solid fa-trash"></i>
             </button>
@@ -1353,12 +1501,25 @@ function renderLinksForCategory(categoryId) {
                     
                     // Update icon preview
                     if (field === 'icon' && iconPreview) {
-                        iconPreview. className = input.value || 'fa-solid fa-link';
+                        iconPreview.className = input.value || 'fa-solid fa-link';
                     }
                 }
             });
         });
         
+        // Visibility toggle for link
+        const visBtn = item.querySelector('.toggle-visibility');
+        if (visBtn) {
+            visBtn.addEventListener('click', () => {
+                if (links[categoryId] && links[categoryId][index]) {
+                    links[categoryId][index].hidden = !links[categoryId][index].hidden;
+                    saveLinks(links);
+                    renderLinksForCategory(categoryId);
+                    renderLinksGrid();
+                }
+            });
+        }
+
         item.querySelector('.delete-btn'). addEventListener('click', () => {
             deleteLink(categoryId, index);
         });
@@ -1379,7 +1540,8 @@ function addLink() {
     links[categoryId].push({
         name: 'New Link',
         url: 'https://',
-        icon: 'fa-solid fa-link'
+        icon: 'fa-solid fa-link',
+        hidden: false
     });
     
     saveLinks(links);

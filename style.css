@@ -675,6 +675,31 @@ body {
     transition: all var(--transition-fast);
 }
 
+.toggle-visibility,
+.toggle-pin {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--overlay1);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.toggle-visibility:hover,
+.toggle-pin:hover {
+    background: var(--surface0);
+}
+
+.toggle-pin.active {
+    background: var(--primary);
+    color: var(--crust);
+}
+
 .delete-btn:hover {
     background: var(--red);
     color: var(--crust);
@@ -1011,6 +1036,51 @@ body {
     }
 }
 
+/* Pinned layout: when a single category is pinned, show it full-width on top
+   and render the remaining categories inside an inner grid below. */
+.links-grid.has-pinned {
+    grid-template-columns: 1fr;
+}
+.links-grid.has-pinned > .pinned-section {
+    /* pinned-section contains one .link-group which will span full width */
+}
+.links-grid.has-pinned > .others-section {
+    display: grid;
+    gap: var(--spacing-xl);
+}
+.links-grid.has-pinned.grid-even > .others-section {
+    grid-template-columns: repeat(2, 1fr);
+}
+.links-grid.has-pinned.grid-odd > .others-section {
+    grid-template-columns: repeat(3, 1fr);
+}
+.links-grid.has-pinned.grid-single > .others-section {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 1200px) {
+    .links-grid.has-pinned.grid-odd > .others-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .links-grid.has-pinned.grid-even > .others-section,
+    .links-grid.has-pinned.grid-odd > .others-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 650px) {
+    .links-grid.has-pinned > .others-section,
+    .links-grid.has-pinned > .pinned-section {
+        grid-template-columns: 1fr;
+    }
+}
+
 .link-group {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
@@ -1151,6 +1221,20 @@ body {
 
 .link-card:hover .link-icon {
     transform: scale(1.2);
+}
+
+/* Drag visuals */
+.link-card.dragging {
+    opacity: 0.5;
+    outline: 2px dashed rgba(203,166,247,0.6);
+}
+.links.drag-over {
+    outline: 2px dashed rgba(203,166,247,0.25);
+    background: rgba(203,166,247,0.02);
+}
+.link-group.dragging {
+    opacity: 0.9;
+    transform: scale(0.995);
 }
 
 .link-text {
