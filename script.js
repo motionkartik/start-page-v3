@@ -188,6 +188,43 @@ let settings = loadSettings();
 let categories = loadCategories();
 let links = loadLinks();
 let currentEngine = settings.preferredEngine;
+// Search engines storage (migrates from settings.enabledEngines on first run)
+function loadSearchEngines() {
+    const saved = localStorage.getItem('searchEngines');
+    if (!saved) {
+        const arr = Object.keys(allSearchEngines).map(id => ({
+            id,
+            name: allSearchEngines[id].name,
+            url: allSearchEngines[id].url,
+            iconHtml: allSearchEngines[id].icon,
+            visible: settings.enabledEngines.includes(id)
+        }));
+        localStorage.setItem('searchEngines', JSON.stringify(arr));
+        return arr;
+    }
+    try {
+        return JSON.parse(saved);
+    } catch (err) {
+        console.error('Failed to parse saved searchEngines, rebuilding defaults', err);
+        return loadSearchEngines();
+    }
+}
+
+function saveSearchEngines(arr) {
+    localStorage.setItem('searchEngines', JSON.stringify(arr));
+    // keep enabledEngines in settings in sync
+    const enabled = arr.filter(e => e.visible).map(e => e.id);
+    if (enabled.length === 0) {
+        // ensure at least one engine remains enabled
+        enabled.push(arr[0]?.id || 'google');
+        const first = arr.find(a => a.id === enabled[0]);
+        if (first) first.visible = true;
+        localStorage.setItem('searchEngines', JSON.stringify(arr));
+    }
+    saveSettings('enabledEngines', enabled);
+}
+
+let searchEngines = loadSearchEngines();
 
 // Normalize pinned state: allow only one pinned category (keep first if multiple)
 (() => {
@@ -286,44 +323,47 @@ function updateGreeting(hour) {
 function performSearch(query) {
     if (!query.trim()) return;
     // Always open search results in a new tab
-    const engine = allSearchEngines[currentEngine];
+    // prefer managed searchEngines (user-defined), fall back to built-in list
+    const managed = searchEngines.find(e => e.id === currentEngine);
+    const engine = managed || allSearchEngines[currentEngine];
     if (!engine) return;
-    const searchUrl = engine.url + encodeURIComponent(query);
+    const searchUrl = (engine.url || '') + encodeURIComponent(query);
     window.open(searchUrl, '_blank');
 }
 
 function setSearchEngine(engine) {
-    if (!allSearchEngines[engine]) return;
-    if (!settings.enabledEngines.includes(engine)) return;
-    
+    // allow selecting engines defined in managed list or built-in list
+    const managed = searchEngines.find(e => e.id === engine && e.visible);
+    const builtin = allSearchEngines[engine] && settings.enabledEngines.includes(engine);
+    if (!managed && !builtin) return;
+
     currentEngine = engine;
     saveSettings('preferredEngine', engine);
-    
+
     document.querySelectorAll('.search-engines .engine').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.engine === engine);
     });
-    
+
+    const label = managed ? managed.name : (allSearchEngines[engine] ? allSearchEngines[engine].name : engine);
     if (searchInput) {
-        searchInput.placeholder = `Search ${allSearchEngines[engine].name}... `;
+        searchInput.placeholder = `Search ${label}... `;
     }
 }
 
 function renderSearchEngines() {
     const container = document.querySelector('.search-engines');
     if (!container) return;
-    
-    container.innerHTML = settings.enabledEngines.map((engineId, index) => {
-        const engine = allSearchEngines[engineId];
-        if (!engine) return '';
-        return `
-            <button class="engine ${engineId === currentEngine ? 'active' : ''}" 
-                    data-engine="${engineId}" 
-                    title="${engine.name} (${index + 1})">
-                ${engine.icon}
-            </button>
-        `;
-    }). join('');
-    
+
+    // Include visible managed engines even if they are custom (not present in allSearchEngines)
+    const visible = searchEngines.filter(e => e.visible && (allSearchEngines[e.id] || (e.url && e.url.length > 0)));
+    container.innerHTML = visible.map((engine, index) => `
+        <button class="engine ${engine.id === currentEngine ? 'active' : ''}" 
+                data-engine="${engine.id}" 
+                title="${engine.name} (${index + 1})">
+            ${engine.iconHtml}
+        </button>
+    `).join('');
+
     // Rebind click events
     container.querySelectorAll('.engine').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -331,7 +371,7 @@ function renderSearchEngines() {
             if (searchInput) searchInput.focus();
         });
     });
-    
+
     // Update keyboard hints
     updateKeyboardHints();
 }
@@ -340,7 +380,7 @@ function updateKeyboardHints() {
     const hintsContainer = document. querySelector('.keyboard-hints');
     if (!hintsContainer) return;
     
-    const engineCount = settings.enabledEngines.length;
+    const engineCount = searchEngines.filter(e => e.visible).length;
     const engineHint = engineCount > 1 ? `<kbd>1-${engineCount}</kbd> Engine` : '';
     
     hintsContainer.innerHTML = `
@@ -714,6 +754,8 @@ function initSettings() {
             
             if (tabId === 'categories') {
                 renderCategoriesSettings();
+                    } else if (tabId === 'search-engines') {
+                        renderSearchEnginesSettings();
             } else if (tabId === 'links') {
                 renderLinksSettings();
             }
@@ -853,6 +895,12 @@ function initSettings() {
         addLinkBtn.addEventListener('click', addLink);
     }
     
+    // Add search engine button
+    const addSearchEngineBtn = document.getElementById('add-search-engine-btn');
+    if (addSearchEngineBtn) {
+        addSearchEngineBtn.addEventListener('click', addSearchEngine);
+    }
+    
     // Category selector for links
     const linkCategorySelect = document.getElementById('link-category-select');
     if (linkCategorySelect) {
@@ -893,10 +941,8 @@ function populateSettingsUI() {
         waqiInput.value = settings.waqiApiKey || '';
     }
     
-    // Populate search engine checkboxes
-    document.querySelectorAll('#search-engine-options input').forEach(checkbox => {
-        checkbox.checked = settings.enabledEngines.includes(checkbox.dataset.engine);
-    });
+    // Render search engines settings panel if present
+    renderSearchEnginesSettings();
     
     updateToggleStates();
 }
@@ -923,7 +969,8 @@ function buildBackupObject() {
             weatherLocation: settings.weatherLocation || ''
         },
         categories: categories,
-        links: links
+        links: links,
+        searchEngines: searchEngines
     };
 }
 
@@ -951,7 +998,7 @@ function exportBackup() {
 }
 
 // Export selected sections (used by export options modal)
-function exportSelectedSections({ settings: exSettings, categories: exCats, links: exLinks, includeKeys }) {
+function exportSelectedSections({ settings: exSettings, categories: exCats, links: exLinks, searchEngines: exSearchEngines, includeKeys }) {
     try {
         const now = new Date();
         const pad = n => String(n).padStart(2, '0');
@@ -982,6 +1029,10 @@ function exportSelectedSections({ settings: exSettings, categories: exCats, link
 
         if (exLinks) {
             out.links = links;
+        }
+        
+        if (exSearchEngines) {
+            out.searchEngines = searchEngines;
         }
 
         const json = JSON.stringify(out, null, 2);
@@ -1077,14 +1128,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const exSettings = document.getElementById('exp-settings')?.checked;
             const exCats = document.getElementById('exp-categories')?.checked;
             const exLinks = document.getElementById('exp-links')?.checked;
+            const exSearchEngines = document.getElementById('exp-search-engines')?.checked;
             const includeKeys = document.getElementById('exp-include-keys')?.checked;
 
-            if (!exSettings && !exCats && !exLinks) {
+            if (!exSettings && !exCats && !exLinks && !exSearchEngines) {
                 showResultModal('Export Error', 'Please select at least one section to export.');
                 return;
             }
 
-            exportSelectedSections({ settings: !!exSettings, categories: !!exCats, links: !!exLinks, includeKeys: !!includeKeys });
+            exportSelectedSections({ settings: !!exSettings, categories: !!exCats, links: !!exLinks, searchEngines: !!exSearchEngines, includeKeys: !!includeKeys });
         });
     }
 });
@@ -1105,6 +1157,11 @@ function applyBackupReplace(backup) {
         // Replace categories and links
         categories = Array.isArray(backup.categories) ? backup.categories : [];
         links = backup.links || {};
+        // Replace search engines if provided
+        if (Array.isArray(backup.searchEngines)) {
+            searchEngines = backup.searchEngines;
+            saveSearchEngines(searchEngines);
+        }
 
         saveCategories(categories);
         saveLinks(links);
@@ -1113,6 +1170,7 @@ function applyBackupReplace(backup) {
         renderCategoriesSettings();
         renderLinksGrid();
         renderSearchEngines();
+        renderSearchEnginesSettings();
         populateSettingsUI();
 
         showResultModal('Import Complete', 'Backup imported (replace).');
@@ -1178,6 +1236,26 @@ function applyBackupMerge(backup) {
         // Persist
         saveCategories(categories);
         saveLinks(links);
+        // Merge search engines: add only engines whose id does not already exist
+        if (Array.isArray(backup.searchEngines)) {
+            const existingIds = new Set(searchEngines.map(se => se.id));
+            backup.searchEngines.forEach(se => {
+                if (!se || typeof se !== 'object' || !se.id) return;
+                if (existingIds.has(se.id)) return;
+                // ensure fields exist
+                const entry = {
+                    id: se.id,
+                    name: se.name || se.id,
+                    url: se.url || '',
+                    iconHtml: se.iconHtml || se.iconHtml === '' ? se.iconHtml : (se.icon || ''),
+                    visible: typeof se.visible === 'boolean' ? se.visible : true
+                };
+                searchEngines.push(entry);
+            });
+            saveSearchEngines(searchEngines);
+            renderSearchEngines();
+            renderSearchEnginesSettings();
+        }
 
         // Re-render UI
         renderCategoriesSettings();
@@ -1215,8 +1293,9 @@ function handleImportFile(file) {
                 // Build a friendly summary
                 const catCount = Array.isArray(data.categories) ? data.categories.length : 0;
                 const linksCount = data.links ? Object.values(data.links).reduce((s, arr) => s + (Array.isArray(arr) ? arr.length : 0), 0) : 0;
+                const seCount = Array.isArray(data.searchEngines) ? data.searchEngines.length : 0;
                 const ts = (data.meta && data.meta.timestamp) ? new Date(data.meta.timestamp).toLocaleString() : 'unknown';
-                const msg = `Backup from ${ts} — ${catCount} categories, ${linksCount} links. Use the checkbox below to include API keys if desired.`;
+                const msg = `Backup from ${ts} — ${catCount} categories, ${linksCount} links, ${seCount} search engines. Use the checkbox below to include API keys if desired.`;
                 const msgEl = document.getElementById('import-confirm-message');
                 if (msgEl) msgEl.textContent = msg;
                 icm.classList.add('active');
@@ -1280,6 +1359,21 @@ function validateBackup(obj) {
                             if (!l.url || typeof l.url !== 'string') errors.push(`links['${catId}'][${j}].url is required and must be a string.`);
                         }
                     });
+                }
+            });
+        }
+    }
+
+    if (obj.searchEngines) {
+        if (!Array.isArray(obj.searchEngines)) errors.push('searchEngines must be an array.');
+        else {
+            obj.searchEngines.forEach((se, i) => {
+                if (!se || typeof se !== 'object') errors.push(`searchEngines[${i}] must be an object.`);
+                else {
+                    if (!se.id || typeof se.id !== 'string') errors.push(`searchEngines[${i}].id is required and must be a string.`);
+                    if (!se.name || typeof se.name !== 'string') errors.push(`searchEngines[${i}].name is required and must be a string.`);
+                    if (!se.url || typeof se.url !== 'string') errors.push(`searchEngines[${i}].url is required and must be a string.`);
+                    if (typeof se.visible !== 'undefined' && typeof se.visible !== 'boolean') errors.push(`searchEngines[${i}].visible must be a boolean if present.`);
                 }
             });
         }
@@ -1559,6 +1653,99 @@ function deleteLink(categoryId, index) {
 }
 
 // ========================================
+// Search Engines Management (Settings Panel)
+// ========================================
+
+function renderSearchEnginesSettings() {
+    const container = document.getElementById('search-engines-list');
+    if (!container) return;
+
+    container.innerHTML = searchEngines.map(engine => `
+        <div class="category-item search-engine-item" data-id="${engine.id}">
+            <span class="icon-preview">${engine.iconHtml || '<i class="fa-solid fa-magnifying-glass"></i>'}</span>
+            <input type="text" class="icon-input" value="${(engine.iconHtml||'').replace(/"/g, '&quot;')}" placeholder="HTML or <i class=...>" data-field="iconHtml">
+            <input type="text" value="${(engine.name||'').replace(/"/g, '&quot;')}" placeholder="Name" maxlength="30" data-field="name">
+            <input type="url" class="url-input" value="${(engine.url||'').replace(/"/g, '&quot;')}" placeholder="https://..." data-field="url">
+            <button class="toggle-visibility" title="Toggle Visibility" data-action="visibility">
+                <i class="fa-solid ${engine.visible ? 'fa-eye' : 'fa-eye-slash'}"></i>
+            </button>
+            <button class="delete-btn" title="Delete Search Engine">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+
+    // Bind events
+    container.querySelectorAll('.search-engine-item').forEach(item => {
+        const id = item.dataset.id;
+        const engine = searchEngines.find(e => e.id === id);
+        if (!engine) return;
+
+        const iconInput = item.querySelector('input[data-field="iconHtml"]');
+        const nameInput = item.querySelector('input[data-field="name"]');
+        const urlInput = item.querySelector('input[data-field="url"]');
+        const preview = item.querySelector('.icon-preview');
+
+        [iconInput, nameInput, urlInput].forEach(inp => {
+            if (!inp) return;
+            inp.addEventListener('input', () => {
+                const field = inp.dataset.field;
+                engine[field] = inp.value;
+                saveSearchEngines(searchEngines);
+                renderSearchEngines();
+                if (field === 'iconHtml' && preview) preview.innerHTML = engine.iconHtml || '';
+            });
+        });
+
+        const visBtn = item.querySelector('.toggle-visibility');
+        if (visBtn) {
+            visBtn.addEventListener('click', () => {
+                engine.visible = !engine.visible;
+                saveSearchEngines(searchEngines);
+                renderSearchEnginesSettings();
+                renderSearchEngines();
+            });
+        }
+
+        const delBtn = item.querySelector('.delete-btn');
+        if (delBtn) {
+            delBtn.addEventListener('click', () => {
+                // immediate delete as requested
+                const idx = searchEngines.findIndex(e => e.id === id);
+                if (idx !== -1) {
+                    searchEngines.splice(idx, 1);
+                    // ensure at least one engine remains
+                    if (searchEngines.length === 0) {
+                        const fallback = { id: 'google', name: 'Google', url: allSearchEngines.google.url, iconHtml: allSearchEngines.google.icon, visible: true };
+                        searchEngines.push(fallback);
+                    }
+                    saveSearchEngines(searchEngines);
+                    renderSearchEnginesSettings();
+                    renderSearchEngines();
+                }
+            });
+        }
+    });
+}
+
+function addSearchEngine() {
+    const newId = 'se_' + Date.now();
+    const entry = {
+        id: newId,
+        name: 'New Engine',
+        url: 'https://www.google.com/search?q=',
+        iconHtml: '<i class="fa-solid fa-magnifying-glass"></i>',
+        visible: true
+    };
+    searchEngines.push(entry);
+    saveSearchEngines(searchEngines);
+    renderSearchEnginesSettings();
+    renderSearchEngines();
+    // select as preferred engine
+    setSearchEngine(entry.id);
+}
+
+// ========================================
 // Keyboard Shortcuts
 // ========================================
 
@@ -1576,11 +1763,12 @@ function handleKeyboard(event) {
         searchInput.blur();
     }
     
-    // Dynamic engine switching based on enabled engines
+    // Dynamic engine switching based on visible managed engines
     if (document.activeElement !== searchInput && !isSettingsOpen) {
         const num = parseInt(event.key);
-        if (num >= 1 && num <= settings.enabledEngines.length) {
-            setSearchEngine(settings.enabledEngines[num - 1]);
+        const visible = searchEngines.filter(e => e.visible).map(e => e.id);
+        if (num >= 1 && num <= visible.length) {
+            setSearchEngine(visible[num - 1]);
         }
     }
 }
@@ -1669,11 +1857,14 @@ function init() {
     
     // Quotes removed
     
-    // Restore preferred search engine
-    if (settings.enabledEngines.includes(settings.preferredEngine)) {
+    // Restore preferred search engine (use managed engines when available)
+    const visibleEngines = searchEngines.filter(e => e.visible).map(e => e.id);
+    if (visibleEngines.includes(settings.preferredEngine)) {
         setSearchEngine(settings.preferredEngine);
-    } else if (settings.enabledEngines.length > 0) {
-        setSearchEngine(settings.enabledEngines[0]);
+    } else if (visibleEngines.length > 0) {
+        setSearchEngine(visibleEngines[0]);
+    } else {
+        setSearchEngine('google');
     }
     
     // Initialize event listeners

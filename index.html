@@ -52,6 +52,9 @@
                     <button class="settings-tab active" data-tab="general">
                         <i class="fa-solid fa-sliders"></i> General
                     </button>
+                    <button class="settings-tab" data-tab="search-engines">
+                        <i class="fa-solid fa-magnifying-glass"></i> Search Engines
+                    </button>
                     <button class="settings-tab" data-tab="categories">
                         <i class="fa-solid fa-folder"></i> Categories
                     </button>
@@ -127,54 +130,7 @@
                             <input type="text" id="setting-waqi-api-key" class="setting-input" placeholder="Enter WAQI token">
                         </div>
                         
-                        <div class="setting-item setting-item-vertical">
-                            <div class="setting-label">
-                                <i class="fa-solid fa-magnifying-glass"></i>
-                                <span>Search Engines</span>
-                            </div>
-                            <div class="search-engine-grid" id="search-engine-options">
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="google" checked>
-                                    <span class="engine-icon"><i class="fa-brands fa-google"></i></span>
-                                    <span>Google</span>
-                                </label>
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="duckduckgo" checked>
-                                    <span class="engine-icon"><span class="nf-icon">󰇥</span></span>
-                                    <span>DuckDuckGo</span>
-                                </label>
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="github" checked>
-                                    <span class="engine-icon"><i class="fa-brands fa-github"></i></span>
-                                    <span>GitHub</span>
-                                </label>
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="youtube" checked>
-                                    <span class="engine-icon"><i class="fa-brands fa-youtube"></i></span>
-                                    <span>YouTube</span>
-                                </label>
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="bing">
-                                    <span class="engine-icon"><i class="fa-brands fa-microsoft"></i></span>
-                                    <span>Bing</span>
-                                </label>
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="amazon">
-                                    <span class="engine-icon"><i class="fa-brands fa-amazon"></i></span>
-                                    <span>Amazon</span>
-                                </label>
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="wikipedia">
-                                    <span class="engine-icon"><i class="fa-brands fa-wikipedia-w"></i></span>
-                                    <span>Wikipedia</span>
-                                </label>
-                                <label class="engine-checkbox">
-                                    <input type="checkbox" data-engine="archive">
-                                    <span class="engine-icon"><i class="fa-solid fa-box-archive"></i></span>
-                                    <span>Internet Archive</span>
-                                </label>
-                            </div>
-                        </div>
+                        <!-- Search Engines moved to its own tab -->
 
                         <!-- Drag & Drop removed -->
 
@@ -193,6 +149,17 @@
                         </div>
                     </div>
                     
+                    <!-- Search Engines Tab -->
+                    <div class="settings-panel" data-panel="search-engines">
+                        <p class="panel-description">Manage your search engines. Add, edit, toggle visibility or delete entries.</p>
+                        <div class="categories-list" id="search-engines-list">
+                            <!-- Search engines will be populated dynamically -->
+                        </div>
+                        <button class="add-btn" id="add-search-engine-btn">
+                            <i class="fa-solid fa-plus"></i> Add Search Engine
+                        </button>
+                    </div>
+
                     <!-- Categories Tab -->
                     <div class="settings-panel" data-panel="categories">
                         <p class="panel-description">Add as much as Categories you want.</p>
@@ -254,6 +221,7 @@
                             <label><input type="checkbox" id="exp-settings" checked> Settings</label>
                             <label><input type="checkbox" id="exp-categories" checked> Categories</label>
                             <label><input type="checkbox" id="exp-links" checked> Links</label>
+                            <label><input type="checkbox" id="exp-search-engines" checked> Search Engines</label>
                         </div>
                         <div style="margin-top:0.5rem;">
                             <label><input type="checkbox" id="exp-include-keys"> Include API keys (Export with caution)</label>
