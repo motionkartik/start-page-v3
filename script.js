@@ -732,7 +732,7 @@ async function fetchWeather(query) {
         const humidity = data.main.humidity;
         const iconCode = data.weather[0].icon;
         const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`;
-        const humidityIconUrl = 'https://openweathermap.org/img/widget_icons/humidity-low.svg';
+        const humidityIconUrl = 'icons/humidity-low.svg';
 
         const tempUnit = unit === 'metric' ? '°C' : '°F';
 
@@ -831,7 +831,7 @@ function showMockWeather() {
         unit = '°F';
     }
 
-    weatherElement.innerHTML = `${temp}${unit} ${weather.condition} | <img src="https://openweathermap.org/img/widget_icons/humidity-low.svg" class="humidity-icon" alt="Humidity"> 00% | 00 AQI`;
+    weatherElement.innerHTML = `${temp}${unit} ${weather.condition} | <img src="icons/humidity-low.svg" class="humidity-icon" alt="Humidity"> 00% | 00 AQI`;
 
     // Get the parent widget and find the icon element
     const widgetElement = weatherElement.parentElement;
